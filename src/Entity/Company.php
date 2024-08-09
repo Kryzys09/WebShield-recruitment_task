@@ -19,6 +19,17 @@ final class Company {
         $this->setName($name);
     }
 
+    public function getAddress(): ?Address {
+        return $this->address;
+    }
+
+    /** @throws InvalidPropertyException */
+    public function setAddress(string $country, string $zipCode, string $city, string $street, string $streetNr, ?string $apartmentNr = null): self {
+        $this->address = new Address($country, $zipCode, $city, $street, $streetNr, $apartmentNr);
+
+        return $this;
+    }
+
     public function getId(): int {
         return $this->id;
     }
