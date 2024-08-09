@@ -2,26 +2,32 @@
 
 namespace App\Validate;
 
-final class NameValidator {
+final class NameValidator extends StringValidator {
+    public const FORBIDDEN_NAME_CHARS_REGEX = "/[^a-zA-Z .,'-]/";
+    public const FORBIDDEN_COMPANY_NAME_CHARS_REGEX = "/[^a-zA-Z0-9\s.,\-_:'\"\/]/";
+
+    public const MIN_NAME_LENGTH = 2;
+    public const MAX_NAME_LENGTH = 127;
+    public const MIN_COMPANY_NAME_LENGTH = 4;
+    public const MAX_COMPANY_NAME_LENGTH = 127;
+
     /**
-     * @param string regex - Regex for searching violations (should match all forbidden characters inside given name).
-     *                       Default regex checks for characters outside of latin alphabets and different than " ", ".", ",", "'", or "-".
+     * @param string regex - string containing a regex to find forbidden characters inside given name 
      * 
      * @return array - array of name violations
      */
-    public static function validateName(string $name, int $minLength = 2, int $maxLength = 127, string $regex = "/[^a-zA-Z .,'-]/"): array {
-        $violations = [];
-        // translating non-latin chars into their latin equivalents (eg.: ł => l, ö => o)
+    public static function validateName(
+        string $name,
+        int $minLength = self::MIN_NAME_LENGTH,
+        int $maxLength = self::MAX_NAME_LENGTH,
+        string $regex = self::FORBIDDEN_NAME_CHARS_REGEX,
+        string $alias = 'name'
+    ): array {
+        // translating latin chars into their ASCII equivalents (eg.: ł => l, ö => o)
         $name = \transliterator_transliterate('Latin-ASCII', $name);
 
-        if (\mb_strlen($name) < $minLength)
-            $violations[] = "Name too short! (min. $minLength characters)";
-        else if (\mb_strlen($name) > $maxLength)
-            $violations[] = "Name too long! (max. $maxLength characters)";
-        
-        \preg_match($regex, $name, $regExViolations);
-        if ($regExViolations)
-            $violations[] = "Given name contains not permitted characters: '" . \implode("', '", $regExViolations). "'!";;
+        $violations = self::validateLength($name, $minLength, $maxLength, $alias);
+        $violations = \array_merge($violations, self::validateContainingCharacters($name, $regex, $alias));
 
         return $violations;
     }
@@ -29,14 +35,13 @@ final class NameValidator {
     /**
      * @return array - array of company name violations
      */
-    public static function validateCompanyName(string $name): array {
-        $regex = "/[^a-zA-Z0-9\s.,\-_:'\"\/]/";
-
+    public static function validateCompanyName(string $name, string $alias = 'company name'): array {
         return self::validateName(
             $name,
-            4,
-            127,
-            $regex
+            self::MIN_COMPANY_NAME_LENGTH,
+            self::MAX_COMPANY_NAME_LENGTH,
+            self::FORBIDDEN_COMPANY_NAME_CHARS_REGEX,
+            $alias
         );
     }
 }

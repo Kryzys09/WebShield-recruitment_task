@@ -2,22 +2,23 @@
 
 namespace App\Entity;
 
+use App\Exception\InvalidPropertyException;
 use App\Validate\NameValidator;
+use App\ValueObject\Address;
 
 final class Owner {
-    /**
-     * @var Company[]
-     */
-    private $companies;
+    private string $lastName;
+    private ?string $firstName;
+    private ?Address $address;
 
-    /**
-     * @param Company[] companies
-     */
-    function __construct(private int $id, private string $lastName, private ?string $firstName = null, array $companies = []) {
+    /** @var Company[] */
+    private array $companies;
+
+    /** @throws InvalidPropertyException */
+    function __construct(private readonly int $id, string $lastName, ?string $firstName = null) {
         $this->companies = [];
-        foreach ($companies as $company) {
-            $this->addCompany($company);
-        }
+        $this->setLastName($lastName);
+        if ($firstName !== null) $this->setFirstName($firstName);
     }
 
     public function getId(): int {
@@ -29,9 +30,11 @@ final class Owner {
     }
 
     public function setLastName(string $lastName): self {
-        $violations = NameValidator::validateName($lastName);
-        if (!$violations)
-            $this->lastName = $lastName;
+        $violations = NameValidator::validateName($lastName, alias: 'last name');
+        if ($violations)
+            throw new InvalidPropertyException($violations[0]);
+
+        $this->lastName = $lastName;
 
         return $this;
     }
@@ -41,9 +44,11 @@ final class Owner {
     }
 
     public function setFirstName(string $firstName): self {
-        $violations = NameValidator::validateName($firstName);
-        if (!$violations)
-            $this->firstName = $firstName;
+        $violations = NameValidator::validateName($firstName, alias: 'first name');
+        if ($violations)
+            throw new InvalidPropertyException($violations[0]);
+
+        $this->firstName = $firstName;
 
         return $this;
     }

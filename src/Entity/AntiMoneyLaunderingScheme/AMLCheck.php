@@ -2,6 +2,6 @@
 
 namespace App\Entity\AntiMoneyLaunderingScheme;
 
-final class AMLCheck {
+abstract class AMLCheck {
     
 }

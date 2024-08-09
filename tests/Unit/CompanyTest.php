@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Entity\Company;
 use App\Entity\Owner;
+use App\Exception\InvalidPropertyException;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
@@ -19,11 +20,9 @@ final class CompanyTest extends TestCase {
         $this->company = new Company('1', 'abcd Ltd.');
     }
 
-    function testIncorrectOwnersSupplied(): void {
-        // just an anonymous dummy object similar to an Owner object
-        $dummy = new class(0, 'aaa', 'bbb') {function __construct(private int $id, private string $lastName, private string $firstName){}};
-        $this->expectException(\TypeError::class);
-        new Company(1, 'aaa', [$dummy]);
+    function testCreationFromIncorrectData(): void {
+        $this->expectException(InvalidPropertyException::class);
+        new Company(1, '');
     }
 
     function testOwnerAddition(): Owner {

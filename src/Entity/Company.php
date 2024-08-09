@@ -2,22 +2,21 @@
 
 namespace App\Entity;
 
+use App\Exception\InvalidPropertyException;
 use App\Validate\NameValidator;
+use App\ValueObject\Address;
 
 final class Company {
-    /**
-     * @var Owner[]
-     */
-    private $owners;
+    private string $name;
+    private ?Address $address;
 
-    /**
-     * @param Owner[] owners
-     */
-    function __construct(private int $id, private string $name, array $owners = []) {
+    /** @var Owner[] */
+    private array $owners;
+
+    /** @throws InvalidPropertyException */
+    function __construct(private readonly int $id, string $name) {
         $this->owners = [];
-        foreach ($owners as $owner) {
-            $this->addOwner($owner);
-        }
+        $this->setName($name);
     }
 
     public function getId(): int {
@@ -30,8 +29,10 @@ final class Company {
 
     public function setName(string $name): self {
         $violations = NameValidator::validateCompanyName($name);
-        if (!$violations)
-            $this->name = $name;
+        if ($violations)
+            throw new InvalidPropertyException($violations[0]);
+        
+        $this->name = $name;
 
         return $this;
     }
