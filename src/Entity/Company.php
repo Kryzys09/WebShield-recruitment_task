@@ -48,6 +48,7 @@ final class Company {
         return $this;
     }
 
+    /** @return Owner[] */
     public function getOwners(): array {
         return $this->owners;
     }

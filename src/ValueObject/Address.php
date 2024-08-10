@@ -35,7 +35,7 @@ final readonly class Address {
         return $this->country;
     }
     
-    public function setCountry($country): self {
+    public function setCountry(string $country): self {
         $violations = AddressValidator::validateCountry($country);
         if ($violations)
             throw new InvalidPropertyException($violations[0]);
@@ -49,7 +49,7 @@ final readonly class Address {
         return $this->zipCode;
     }
 
-    public function setZipCode($zipCode): self {
+    public function setZipCode(string $zipCode): self {
         $violations = AddressValidator::validateZipCode($zipCode);
         if ($violations)
             throw new InvalidPropertyException($violations[0]);
@@ -63,7 +63,7 @@ final readonly class Address {
         return $this->city;
     }
 
-    public function setCity($city): self {
+    public function setCity(string $city): self {
         $violations = AddressValidator::validateCity($city);
         if ($violations)
             throw new InvalidPropertyException($violations[0]);
@@ -77,7 +77,7 @@ final readonly class Address {
         return $this->street;
     }
 
-    public function setStreet($street): self {
+    public function setStreet(string $street): self {
         $violations = AddressValidator::validateStreet($street);
         if ($violations)
             throw new InvalidPropertyException($violations[0]);
@@ -91,7 +91,7 @@ final readonly class Address {
         return $this->streetNr;
     }
 
-    public function setStreetNr($streetNr): self {
+    public function setStreetNr(string $streetNr): self {
         $violations = AddressValidator::validateStreetNr($streetNr);
         if ($violations)
             throw new InvalidPropertyException($violations[0]);
@@ -105,7 +105,7 @@ final readonly class Address {
         return $this->apartmentNr;
     }
 
-    public function setApartmentNr($apartmentNr): self {
+    public function setApartmentNr(string $apartmentNr): self {
         $violations = AddressValidator::validateApartmentNr($apartmentNr);
         if ($violations)
             throw new InvalidPropertyException($violations[0]);

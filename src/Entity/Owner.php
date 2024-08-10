@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\AMLScheme\AMLHit;
 use App\Exception\InvalidPropertyException;
 use App\Validate\NameValidator;
 use App\ValueObject\Address;
@@ -14,9 +15,13 @@ final class Owner {
     /** @var Company[] */
     private array $companies;
 
+    /** @var AMLHit[] */
+    private array $currentAMLHits;
+
     /** @throws InvalidPropertyException */
     function __construct(private readonly int $id, string $lastName, ?string $firstName = null) {
         $this->companies = [];
+        $this->currentAMLHits = [];
         $this->setLastName($lastName);
         if ($firstName !== null) $this->setFirstName($firstName);
     }
@@ -26,7 +31,14 @@ final class Owner {
     }
 
     /** @throws InvalidPropertyException */
-    public function setAddress(string $country, string $zipCode, string $city, string $street, string $streetNr, ?string $apartmentNr = null): self {
+    public function setAddress(
+        string $country,
+        string $zipCode,
+        string $city,
+        string $street,
+        string $streetNr,
+        ?string $apartmentNr = null
+    ): self {
         $this->address = new Address($country, $zipCode, $city, $street, $streetNr, $apartmentNr);
 
         return $this;
@@ -64,6 +76,7 @@ final class Owner {
         return $this;
     }
 
+    /** @return Company[] */
     public function getCompanies(): array {
         return $this->companies;
     }
@@ -82,6 +95,26 @@ final class Owner {
             unset($this->companies[$internalID]);
             $company->removeOwner($this);
         }
+
+        return $this;
+    }
+
+    /** @return AMLHit[] */
+    public function getCurrentAMLHits(): array {
+        return $this->currentAMLHits;
+    }
+
+    public function addAMLHit(AMLHit $currentAMLHits): self {
+        if ($this !== $currentAMLHits->getOwner())
+            throw new InvalidPropertyException('Trying to assign to an owner an AMLHit of another owner!');
+
+        $this->currentAMLHits[] = $currentAMLHits;
+
+        return $this;
+    }
+
+    public function clearCurrentAMLHits(): self {
+        $this->currentAMLHits = [];
 
         return $this;
     }

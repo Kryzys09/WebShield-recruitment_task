@@ -10,16 +10,16 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(NameValidator::class)]
 final class NameValidatorTest extends TestCase {
     #[DataProvider('validPersonNames')]
-    function testValidPersonName($name): void {
+    function testValidPersonName(string $name): void {
         $this->assertEmpty(NameValidator::validateName($name));
     }
 
     #[DataProvider('invalidPersonNames')]
-    function testInvalidPersonName($name): void {
+    function testInvalidPersonName(string $name): void {
         $this->assertNotEmpty(NameValidator::validateName($name));
     }
 
-    static function validPersonNames() {
+    static function validPersonNames(): array {
         return [
             ['John'],
             ['Brzęczyszczykiewicz'],
@@ -33,7 +33,7 @@ final class NameValidatorTest extends TestCase {
         ];
     }
 
-    static function invalidPersonNames() {
+    static function invalidPersonNames(): array {
         return [
             ['DROP DATABASE;'],
             ['SELECT * FROM secret_data'],
