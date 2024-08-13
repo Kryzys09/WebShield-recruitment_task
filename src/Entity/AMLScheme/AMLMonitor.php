@@ -12,7 +12,7 @@ final class AMLMonitor {
     /** @var AMLCheck[] */
     private array $checks;
 
-    /** @var Company[] */
+    /** @var array(Company => int) */
     private array $highRiskCompanies, $mediumRiskCompanies, $lowRiskCompanies;
 
     function __construct(private readonly int $id) {
@@ -37,32 +37,27 @@ final class AMLMonitor {
     }
 
     /** @param Owner[] owners */
-    function runChecksOnOwners(array $owners): void {
-        echo "\nRunning checks.";
+    protected function runChecksOnOwners(array $owners): void {
         foreach ($this->getChecks() as $check) {
-            echo ".";
             foreach ($owners as $owner) {
                 $check->runFullCheck($owner);
             }
-            \sleep(0.75);
         }
-
-        echo "\nChecks finished.\n";
     }
 
     /** @param Company[] $companies */
-    function flagCompanies(array $companies): void {
+    protected function flagCompanies(array $companies): void {
         foreach ($companies as $company) {
             $hits = 0;
             foreach ($company->getOwners() as $owner) {
                 $hits += \count($owner->getCurrentAMLHits());
             }
-            if ($hits > self::HIGH_RISK_COMPANY_BENCHMARK)
-                $this->addHighRiskCompany($company);
-            else if ($hits > self::MEDIUM_RISK_COMPANY_BENCHMARK)
-                $this->addMediumRiskCompany($company);
+            if ($hits >= self::HIGH_RISK_COMPANY_BENCHMARK)
+                $this->addHighRiskCompany($company, $hits);
+            else if ($hits >= self::MEDIUM_RISK_COMPANY_BENCHMARK)
+                $this->addMediumRiskCompany($company, $hits);
             else
-                $this->addLowRiskCompany($company);
+                $this->addLowRiskCompany($company, $hits);
         }
     }
 
@@ -89,8 +84,8 @@ final class AMLMonitor {
         return $this->highRiskCompanies;
     }
 
-    public function addHighRiskCompany(Company $company): self {
-        $this->highRiskCompanies[] = $company;
+    public function addHighRiskCompany(Company $company, int $hits): self {
+        $this->highRiskCompanies[$company->getId()] = $hits;
 
         return $this;
     }
@@ -100,8 +95,8 @@ final class AMLMonitor {
         return $this->mediumRiskCompanies;
     }
 
-    public function addMediumRiskCompany(Company $company): self {
-        $this->mediumRiskCompanies[] = $company;
+    public function addMediumRiskCompany(Company $company, int $hits): self {
+        $this->mediumRiskCompanies[$company->getId()] = $hits;
 
         return $this;
     }
@@ -111,8 +106,8 @@ final class AMLMonitor {
         return $this->lowRiskCompanies;
     }
 
-    public function addLowRiskCompany(Company $company): self {
-        $this->lowRiskCompanies[] = $company;
+    public function addLowRiskCompany(Company $company, int $hits): self {
+        $this->lowRiskCompanies[$company->getId()] = $hits;
 
         return $this;
     }

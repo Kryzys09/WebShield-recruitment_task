@@ -31,7 +31,7 @@ final class AMLCheck {
 
         if ($riskLevel >= 2) {
             if ($details = $this->enhancedDueDiligence($owner)) {
-                new AMLHit($owner, $this, $details);
+                new AMLHit(0, $owner, $this, $details);
             }
         }
     }
@@ -46,23 +46,22 @@ final class AMLCheck {
     /** Simple mock method - in theory this method returns the level of risk (0-3) associated with given owner */
     protected function riskAssessment(Owner $owner, string $info): int {
         // some magic to consistently mock which owners get flagged
-        $risk = $owner->getId();
+        $risk = 0;
 
         switch ($this->getType()) {
             case self::TYPE_1:
-                if ($owner->getAddress()?->getCountry() === 'UK' || $owner->getAddress()?->getCountry() === 'Spain')
+                if ($owner->getAddress()?->getCountry() === 'United Kingdom' || $owner->getAddress()?->getCountry() === 'Spain')
                     $risk++;
                 if ($owner->getAddress()?->getCountry() === 'Portugal')
                     $risk += 2;
                 break;
             case self::TYPE_2:
-                if (\count($owner->getCompanies()) > 1)
+                if (\count($owner->getCompanies()) > 3)
                     $risk = 3;
                 break;
             case self::TYPE_3:
                 break;
         }
-        $risk %= 4;
 
         return $risk;
     }

@@ -19,6 +19,10 @@ final class Company {
         $this->setName($name);
     }
 
+    function __toString(): string {
+        return $this->getId() . '_' . $this->getName();
+    }
+
     public function getAddress(): ?Address {
         return $this->address;
     }

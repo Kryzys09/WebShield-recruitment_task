@@ -26,6 +26,10 @@ final class Owner {
         if ($firstName !== null) $this->setFirstName($firstName);
     }
 
+    function __toString(): string {
+        return $this->getId() . '_' . $this->getLastName();
+    }
+
     public function getAddress(): ?Address {
         return $this->address;
     }
@@ -104,11 +108,11 @@ final class Owner {
         return $this->currentAMLHits;
     }
 
-    public function addAMLHit(AMLHit $currentAMLHits): self {
-        if ($this !== $currentAMLHits->getOwner())
+    public function addAMLHit(AMLHit $amlHit): self {
+        if ($this !== $amlHit->getOwner())
             throw new InvalidPropertyException('Trying to assign to an owner an AMLHit of another owner!');
 
-        $this->currentAMLHits[] = $currentAMLHits;
+        $this->currentAMLHits[] = $amlHit;
 
         return $this;
     }

@@ -9,9 +9,13 @@ final readonly class AMLHit
     private Owner $owner;
     private AMLCheck $check;
 
-    function __construct(Owner $owner, AMLCheck $check, private string $details) {
+    function __construct(private readonly int $id, Owner $owner, AMLCheck $check, private string $details) {
         $this->setOwner($owner);
         $this->setCheck($check);
+    }
+
+    public function getId(): int {
+        return $this->id;
     }
 
     public function getOwner(): Owner {
